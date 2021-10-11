@@ -50,7 +50,7 @@ class PaymentIntegrationTest {
                 Currency.GBP, "x0x0x0x0x0", "Zakat");
         // Payment request
         PaymentRequest paymentRequest = new PaymentRequest(payment);
-        // When pament is sent
+        // When payment is sent
         ResultActions paymentResultActions = mockMvc.perform(post("/api/v1/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Objects.requireNonNull(objectToJson(paymentRequest))));
@@ -65,6 +65,7 @@ class PaymentIntegrationTest {
                 .hasValueSatisfying(p -> assertThat(p).isEqualToComparingFieldByField(payment));
 
         // TODO: Ensure sms is delivered
+
     }
 
     private String objectToJson(Object object) {

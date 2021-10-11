@@ -2,6 +2,7 @@ package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.Customer;
 import com.amigoscode.testing.customer.CustomerRepository;
+import com.amigoscode.testing.sms.SmsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -26,13 +27,15 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
     @Mock
     private CardPaymentCharger cardPaymentCharger;
+    @Mock
+    private SmsService smsService;
 
     private PaymentService underTest;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        underTest = new PaymentService(customerRepository, paymentRepository, cardPaymentCharger);
+        underTest = new PaymentService(customerRepository, paymentRepository, cardPaymentCharger, smsService);
     }
 
     @Test
