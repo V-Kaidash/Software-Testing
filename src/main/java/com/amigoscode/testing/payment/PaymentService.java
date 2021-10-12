@@ -1,6 +1,7 @@
 package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.CustomerRepository;
+import com.amigoscode.testing.sms.MockSmsService;
 import com.amigoscode.testing.sms.Sms;
 import com.amigoscode.testing.sms.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,9 @@ public class PaymentService {
                 cardSource, amount, currency, customerRepository.findById(customerId).get().getName());
         Sms sms = new Sms();
         sms.setMessage(smsMessage);
-        sms.setCustomerId(customerId);
+        sms.setPaymentId(paymentRequest.getPayment().getPaymentId());
         smsService.sendSms(sms,
                 customerRepository.findById(customerId).get().getPhoneNumber());
-
+        smsService.smsSave(sms);
     }
 }

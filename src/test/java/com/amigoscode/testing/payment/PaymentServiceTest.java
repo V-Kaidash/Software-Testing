@@ -2,7 +2,7 @@ package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.Customer;
 import com.amigoscode.testing.customer.CustomerRepository;
-import com.amigoscode.testing.sms.SmsService;
+import com.amigoscode.testing.sms.MockSmsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +28,7 @@ class PaymentServiceTest {
     @Mock
     private CardPaymentCharger cardPaymentCharger;
     @Mock
-    private SmsService smsService;
+    private MockSmsService smsService;
 
     private PaymentService underTest;
 

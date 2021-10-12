@@ -3,6 +3,7 @@ package com.amigoscode.testing.payment;
 import com.amigoscode.testing.customer.Customer;
 import com.amigoscode.testing.customer.CustomerRegistrationController;
 import com.amigoscode.testing.customer.CustomerRegistrationRequest;
+import com.amigoscode.testing.sms.SmsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class PaymentIntegrationTest {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Autowired
+    private SmsRepository smsRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -65,6 +69,8 @@ class PaymentIntegrationTest {
                 .hasValueSatisfying(p -> assertThat(p).isEqualToComparingFieldByField(payment));
 
         // TODO: Ensure sms is delivered
+        assertThat(smsRepository.findByPaymentId(paymentId))
+                .isNotNull();
 
     }
 

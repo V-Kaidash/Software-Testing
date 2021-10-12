@@ -1,21 +1,26 @@
 package com.amigoscode.testing.sms;
 
-import java.util.UUID;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+@Entity
 public class Sms {
 
+    @Id
+    @GeneratedValue
     private int id;
 
     private String message;
 
-    private UUID customerId;
+    private Long paymentId;
 
     public Sms(){}
 
-    public Sms(int id, String message, UUID customerId) {
+    public Sms(int id, String message, Long paymentId) {
         this.id = id;
         this.message = message;
-        this.customerId = customerId;
+        this.paymentId = paymentId;
     }
 
     public int getId() {
@@ -34,12 +39,12 @@ public class Sms {
         this.message = message;
     }
 
-    public UUID getCustomerId() {
-        return customerId;
+    public Long getPaymentId() {
+        return paymentId;
     }
 
-    public void setCustomerId(UUID customerId) {
-        this.customerId = customerId;
+    public void setPaymentId(Long paymentId) {
+        this.paymentId = paymentId;
     }
 
     @Override
@@ -47,7 +52,7 @@ public class Sms {
         return "Sms{" +
                 "id=" + id +
                 ", message='" + message + '\'' +
-                ", customerId=" + customerId +
+                ", paymentId=" + paymentId +
                 '}';
     }
 }
