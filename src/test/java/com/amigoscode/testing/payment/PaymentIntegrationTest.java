@@ -3,6 +3,7 @@ package com.amigoscode.testing.payment;
 import com.amigoscode.testing.customer.Customer;
 import com.amigoscode.testing.customer.CustomerRegistrationController;
 import com.amigoscode.testing.customer.CustomerRegistrationRequest;
+import com.amigoscode.testing.sms.SmsRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class PaymentIntegrationTest {
     private PaymentRepository paymentRepository;
 
     @Autowired
+    private SmsRepository smsRepository;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Test
@@ -50,7 +54,7 @@ class PaymentIntegrationTest {
                 Currency.GBP, "x0x0x0x0x0", "Zakat");
         // Payment request
         PaymentRequest paymentRequest = new PaymentRequest(payment);
-        // When pament is sent
+        // When payment is sent
         ResultActions paymentResultActions = mockMvc.perform(post("/api/v1/payment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Objects.requireNonNull(objectToJson(paymentRequest))));
@@ -65,6 +69,9 @@ class PaymentIntegrationTest {
                 .hasValueSatisfying(p -> assertThat(p).isEqualToComparingFieldByField(payment));
 
         // TODO: Ensure sms is delivered
+        assertThat(smsRepository.findByPaymentId(paymentId))
+                .isNotNull();
+
     }
 
     private String objectToJson(Object object) {

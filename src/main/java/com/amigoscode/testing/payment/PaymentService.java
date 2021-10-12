@@ -1,9 +1,13 @@
 package com.amigoscode.testing.payment;
 
 import com.amigoscode.testing.customer.CustomerRepository;
+import com.amigoscode.testing.sms.MockSmsService;
+import com.amigoscode.testing.sms.Sms;
+import com.amigoscode.testing.sms.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,14 +19,16 @@ public class PaymentService {
     private final CustomerRepository customerRepository;
     private final PaymentRepository paymentRepository;
     private final CardPaymentCharger cardPaymentCharger;
+    private final SmsService smsService;
 
     @Autowired
     public PaymentService(CustomerRepository customerRepository,
                           PaymentRepository paymentRepository,
-                          CardPaymentCharger cardPaymentCharger) {
+                          CardPaymentCharger cardPaymentCharger, SmsService smsService) {
         this.customerRepository = customerRepository;
         this.paymentRepository = paymentRepository;
         this.cardPaymentCharger = cardPaymentCharger;
+        this.smsService = smsService;
     }
 
     void chargeCard(UUID customerId, PaymentRequest paymentRequest) {
@@ -33,21 +39,25 @@ public class PaymentService {
         }
 
         // 2. Do we support the currency if not throw
-        boolean isCurrencySupported = ACCEPTED_CURRENCIES.contains(paymentRequest.getPayment().getCurrency());
+        Currency currency = paymentRequest.getPayment().getCurrency();
+        boolean isCurrencySupported = ACCEPTED_CURRENCIES.contains(currency);
 
         if (!isCurrencySupported) {
             String message = String.format(
                     "Currency [%s] not supported",
-                    paymentRequest.getPayment().getCurrency());
+                    currency);
             throw new IllegalStateException(message);
         }
 
         // 3. Charge card
+        String cardSource = paymentRequest.getPayment().getSource();
+        BigDecimal amount = paymentRequest.getPayment().getAmount();
+        String description = paymentRequest.getPayment().getDescription();
         CardPaymentCharge cardPaymentCharge = cardPaymentCharger.chargeCard(
-                paymentRequest.getPayment().getSource(),
-                paymentRequest.getPayment().getAmount(),
-                paymentRequest.getPayment().getCurrency(),
-                paymentRequest.getPayment().getDescription()
+                cardSource,
+                amount,
+                currency,
+                description
         );
 
         // 4. If not debited throw
@@ -61,5 +71,13 @@ public class PaymentService {
         paymentRepository.save(paymentRequest.getPayment());
 
         // 6. TODO: send sms
+        String smsMessage = String.format("Card [%s] is debited for [%s %s] by %s.",
+                cardSource, amount, currency, customerRepository.findById(customerId).get().getName());
+        Sms sms = new Sms();
+        sms.setMessage(smsMessage);
+        sms.setPaymentId(paymentRequest.getPayment().getPaymentId());
+        smsService.sendSms(sms,
+                customerRepository.findById(customerId).get().getPhoneNumber());
+        smsService.smsSave(sms);
     }
 }
